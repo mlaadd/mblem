@@ -1,0 +1,2 @@
+export const CHARACTERISTIC_UUID = "38eb4823-7354-4c3b-a06b-802b353103e1";
+export const SERVICE_UUID = "d630046e-d2a7-41ea-a353-61b9393b5b1a";

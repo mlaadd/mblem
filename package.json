@@ -1,0 +1,37 @@
+{
+  "name": "MBLEM",
+  "main": "app/app.ts",
+  "version": "1.0.0",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@nativescript-community/ble": "^3.1.22",
+    "@nativescript-community/perms": "^3.0.4",
+    "@nativescript-community/svelte-native": "~1.0.30",
+    "@nativescript/core": "^9.0.0",
+    "svelte-native": "^1.0.29"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.0.2",
+    "@eslint/js": "^9.39.2",
+    "@nativescript-community/svelte-native-preprocessor": "^1.0.1",
+    "@nativescript/android": "9.0.2",
+    "@nativescript/types": "~9.0.0",
+    "@nativescript/webpack": "~5.0.28",
+    "@types/node": "^24",
+    "eslint": "^9.39.2",
+    "eslint-plugin-svelte": "^3.14.0",
+    "globals": "^17.3.0",
+    "svelte": "~4.2.20",
+    "svelte-loader": "^3.2.4",
+    "svelte-preprocess": "^6.0.3",
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.54.0"
+  },
+  "overrides": {
+    "@nativescript/core": "^9.0.0",
+    "svelte": "~4.2.20"
+  },
+  "scripts": {
+    "lint": "eslint ."
+  }
+}
