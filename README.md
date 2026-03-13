@@ -1,3 +1,4 @@
+
 # MBLEM
 
 MBLEM is an Android app that lets two nearby players play the card game Mau-Mau together using Bluetooth Low Energy (BLE).
@@ -8,7 +9,11 @@ The application is built with NativeScript and Svelte.
 
 ## Installation
 
-An installable APK will be available soon.
+[<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/refs/heads/main/assets/graphics/badge_obtainium.png"
+    alt="Get it on Obtainium"
+    height="80">](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/mlaadd/mblem)
+
+Or Download APK from [Releases](https://github.com/mlaadd/mblem/releases).
 
 ## Development
 
