@@ -1,8 +1,8 @@
 import { disconnect, read, write } from "./ble";
 import { toggleAdvertising } from "./blePeripheral";
-import { get } from "svelte/store";
+import { get, writable } from "svelte/store";
+
 let lastInterval: number;
-import { writable } from "svelte/store";
 export const ready = writable(false);
 export const connected = writable(false);
 export const turn = writable(false);
