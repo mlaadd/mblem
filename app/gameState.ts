@@ -1,5 +1,7 @@
 import { disconnect, read, write } from "./ble";
 import { toggleAdvertising } from "./blePeripheral";
+import { buildDeck } from "./cards";
+import { drawCount, keepsTurn, playDrawDelta } from "./rules";
 import { get, writable } from "svelte/store";
 
 let lastInterval: number;
@@ -121,20 +123,21 @@ export const handleMessage = async (binary: Uint8Array) => {
     const msg = +decoder.decode(msgBytes);
     if (msg === -1) {
       turn.set(true);
-      const numToDraw = Math.max(gameState.drawAcc, 1);
+      const numToDraw = drawCount(gameState.drawAcc);
       cards.update((c) => {
         oppHand.set(get(oppHand).concat(c.splice(0, numToDraw)));
         return c;
       });
       gameState.drawAcc = 0;
     } else {
+      const played = get(oppHand)[msg];
       cards.update((c) => {
         c.push(get(topCard));
         return c;
       });
-      topCard.set(get(oppHand)[msg]);
-      if ((get(topCard) & 0xf) !== 0x1) turn.set(true);
-      if ((get(topCard) & 0xf) === 0x7) gameState.drawAcc += 2;
+      topCard.set(played);
+      if (!keepsTurn(played)) turn.set(true);
+      gameState.drawAcc += playDrawDelta(played);
       oppHand.set(get(oppHand).filter((_, i) => i !== msg));
     }
   }
@@ -160,8 +163,6 @@ export const resetGameState = () => {
   oppHand.set([0xff]);
 };
 
-const cardIdx = [0x1, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xe];
-const cardOffsets = [0x0, 0x10, 0x20, 0x30];
 export const resetCards = () => {
-  cards.set(cardIdx.flatMap((e) => cardOffsets.map((o) => e + o)));
+  cards.set(buildDeck());
 };

@@ -4,38 +4,33 @@
   import { goBack } from "@nativescript-community/svelte-native";
   import { disconnect, write } from "~/ble";
   import { connected, gameState, selfHand, oppHand, topCard, cards, turn } from "~/gameState";
+  import { canPlay, drawCount, keepsTurn, playDrawDelta } from "~/rules";
 
   const unicodeOffset = 0x1f0a0;
 
   const playCard = async (card: number) => {
-    if ($turn) {
-      if (($topCard & 0xf0) == ($selfHand[card] & 0xf0) || ($topCard & 0xf) == ($selfHand[card] & 0xf)) {
-        if (($topCard & 0xf) === 0x7 && ($selfHand[card] & 0xf) !== 7 && gameState.drawAcc > 0) {
-          return;
-        }
-        if (($selfHand[card] & 0xf) === 7) {
-          gameState.drawAcc += 2;
-        }
-        $cards.push($topCard);
-        $topCard = $selfHand.splice(card, 1)[0];
-        $selfHand = $selfHand;
-        await write("PLAY:" + card);
-        if (($topCard & 0xf) === 0x1) return;
-        $turn = false;
-      }
-    }
+    if (!$turn) return;
+    const played = $selfHand[card];
+    if (!canPlay($topCard, played, gameState.drawAcc)) return;
+
+    gameState.drawAcc += playDrawDelta(played);
+    $cards.push($topCard);
+    $topCard = $selfHand.splice(card, 1)[0];
+    $selfHand = $selfHand;
+    await write("PLAY:" + card);
+    if (keepsTurn(played)) return;
+    $turn = false;
   };
 
   const drawCard = async () => {
-    if ($turn) {
-      const numToDraw = Math.max(gameState.drawAcc, 1);
-      gameState.drawAcc = 0;
-      $turn = false;
-      $selfHand.push(...$cards.splice(0, numToDraw));
-      $cards = $cards;
-      $selfHand = $selfHand;
-      await write("PLAY:-1");
-    }
+    if (!$turn) return;
+    const numToDraw = drawCount(gameState.drawAcc);
+    gameState.drawAcc = 0;
+    $turn = false;
+    $selfHand.push(...$cards.splice(0, numToDraw));
+    $cards = $cards;
+    $selfHand = $selfHand;
+    await write("PLAY:-1");
   };
 
   $: {
