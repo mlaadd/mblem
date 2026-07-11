@@ -42,7 +42,7 @@ Build a debug APK:
 bun run build
 ```
 
-Build an optimized release APK:
+Build an optimized release APK - it ships only the 64-bit ARM (`arm64-v8a`) runtime.
 
 ```sh
 bun run build:release
@@ -51,7 +51,7 @@ bun run build:release
 `build:release` builds in webpack production mode (minified/optimized). To sign it for distribution, pass your keystore, e.g.:
 
 ```sh
-bun run build:release -- \
+bun run build:release \
   --key-store-path <path> --key-store-password <password> \
   --key-store-alias <alias> --key-store-alias-password <password>
 ```
