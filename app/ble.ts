@@ -1,6 +1,6 @@
 import { Bluetooth } from "@nativescript-community/ble";
 import { CHARACTERISTIC_UUID, SERVICE_UUID } from "./constants";
-import { gameState, ready, connected, selfHand, oppHand } from "./gameState";
+import { gameState, ready, connected, resetGameState } from "./gameState";
 import { get, writable } from "svelte/store";
 
 export const searchConnection = writable(false);
@@ -56,12 +56,9 @@ export const requestMtu = async () => {
 
 export async function scanAndConnect() {
   console.log("Scanning for players...");
-  gameState.connecting = false;
+  resetGameState();
   searchConnection.set(true);
   let foundSomeone = false;
-  gameState.seeds = [new Uint8Array(), new Uint8Array()];
-  selfHand.set([0xff]);
-  oppHand.set([0xff]);
 
   await ble.startScanning({
     seconds: 10,

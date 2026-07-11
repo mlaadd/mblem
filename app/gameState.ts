@@ -148,6 +148,18 @@ export const gameState = {
   drawAcc: 0,
 };
 
+export const resetGameState = () => {
+  gameState.connecting = false;
+  gameState.seeds = [new Uint8Array(), new Uint8Array()];
+  gameState.player = 0;
+  gameState.gaveup = false;
+  gameState.drawAcc = 0;
+  ready.set(false);
+  turn.set(false);
+  selfHand.set([0xff]);
+  oppHand.set([0xff]);
+};
+
 const cardIdx = [0x1, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xe];
 const cardOffsets = [0x0, 0x10, 0x20, 0x30];
 export const resetCards = () => {
