@@ -10,7 +10,7 @@ The application is built with NativeScript and Svelte.
 
 [<img src="https://raw.githubusercontent.com/ImranR98/Obtainium/refs/heads/main/assets/graphics/badge_obtainium.png"
     alt="Get it on Obtainium"
-    height="80">](https://apps.obtainium.imranr.dev/redirect.html?r=obtainium://add/https://github.com/mlaadd/mblem)
+    height="80">](https://apps.obtainium.page/redirect?r=obtainium://app/%7B%22id%22:%22dev.mlaadd.mblem%22,%22url%22:%22https://github.com/mlaadd/mblem%22,%22author%22:%22mlaadd%22,%22name%22:%22MBLEM%22%7D)
 
 Or download the APK from [Releases](https://github.com/mlaadd/mblem/releases).
 
@@ -48,7 +48,7 @@ Build an optimized release APK - it ships only the 64-bit ARM (`arm64-v8a`) runt
 bun run build:release
 ```
 
-`build:release` builds in webpack production mode (minified/optimized). To sign it for distribution, pass your keystore, e.g.:
+`build:release` builds in webpack production mode (minified/optimized). A keystore is required:
 
 ```sh
 bun run build:release \
@@ -68,7 +68,7 @@ bun run format        # Prettier (write); use format:check in CI
 bun test              # unit tests for the card / rules / protocol modules
 ```
 
-CI (`.github/workflows/ci.yml`) runs the checks above and builds the APK on every push and pull request.
+CI (`.github/workflows/ci.yml`) runs the checks above.
 
 ### Architecture
 
