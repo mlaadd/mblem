@@ -1,6 +1,6 @@
 import { disconnect, read, write } from "./ble";
 import { toggleAdvertising } from "./blePeripheral";
-import { buildDeck } from "./cards";
+import { buildDeck, NO_CARD } from "./cards";
 import { drawCount, keepsTurn, playDrawDelta } from "./rules";
 import { get, writable } from "svelte/store";
 
@@ -8,10 +8,10 @@ let lastInterval: number;
 export const ready = writable(false);
 export const connected = writable(false);
 export const turn = writable(false);
-export const selfHand = writable([0xff]);
-export const oppHand = writable([0xff]);
-export const topCard = writable(0xff);
-export const cards = writable([0xff]);
+export const selfHand = writable([NO_CARD]);
+export const oppHand = writable([NO_CARD]);
+export const topCard = writable(NO_CARD);
+export const cards = writable([NO_CARD]);
 
 function combineSeeds(seedA: Uint8Array, seedB: Uint8Array) {
   const combined = new Uint8Array(seedA.length);
@@ -159,8 +159,8 @@ export const resetGameState = () => {
   gameState.drawAcc = 0;
   ready.set(false);
   turn.set(false);
-  selfHand.set([0xff]);
-  oppHand.set([0xff]);
+  selfHand.set([NO_CARD]);
+  oppHand.set([NO_CARD]);
 };
 
 export const resetCards = () => {

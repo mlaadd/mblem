@@ -5,8 +5,7 @@
   import { disconnect, write } from "~/ble";
   import { connected, gameState, selfHand, oppHand, topCard, cards, turn } from "~/gameState";
   import { canPlay, drawCount, keepsTurn, playDrawDelta } from "~/rules";
-
-  const unicodeOffset = 0x1f0a0;
+  import { CARD_BACK, cardToUnicode, isRed } from "~/cards";
 
   const playCard = async (card: number) => {
     if (!$turn) return;
@@ -49,10 +48,6 @@
     }
   }
 
-  const getUnicode = (id: number) => {
-    return String.fromCodePoint(id + unicodeOffset);
-  };
-
   function chunk(array: Array<number>, size: number) {
     const result = [];
     for (let i = 0; i < array.length; i += size) {
@@ -83,7 +78,7 @@
       <stackLayout orientation="horizontal" horizontalAlignment="center">
         {#each $oppHand as card, i (card)}
           <label
-            text={getUnicode(0)}
+            text={CARD_BACK}
             fontSize="120"
             style:margin-left={i ? "-50" : "0"}
             backgroundColor="white"
@@ -95,15 +90,11 @@
 
     <stackLayout row="1" orientation="horizontal" horizontalAlignment="center">
       <stackLayout>
-        <label text={getUnicode(0)} fontSize="120" on:tap={drawCard} />
+        <label text={CARD_BACK} fontSize="120" on:tap={drawCard} />
       </stackLayout>
 
       <stackLayout>
-        <label
-          text={getUnicode($topCard)}
-          color={($topCard & 0xf0) === 0x10 || ($topCard & 0xf0) === 0x20 ? "firebrick" : "black"}
-          fontSize="120"
-        />
+        <label text={cardToUnicode($topCard)} color={isRed($topCard) ? "firebrick" : "black"} fontSize="120" />
       </stackLayout>
     </stackLayout>
 
@@ -118,12 +109,12 @@
         <stackLayout orientation="horizontal" horizontalAlignment="center" marginBottom="-30">
           {#each handRow as card, i (card)}
             <label
-              text={getUnicode(card)}
+              text={cardToUnicode(card)}
               fontSize="120"
               style:margin-left={i ? "-30" : "0"}
               backgroundColor="white"
               margin="0"
-              color={(card & 0xf0) === 0x10 || (card & 0xf0) === 0x20 ? "firebrick" : "black"}
+              color={isRed(card) ? "firebrick" : "black"}
               on:tap={() => playCard($selfHand.indexOf(card))}
             />
           {/each}
