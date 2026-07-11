@@ -2,6 +2,7 @@ import { Utils } from "@nativescript/core";
 import { CHARACTERISTIC_UUID, SERVICE_UUID } from "./constants";
 import { gameState, handleMessage } from "./gameState";
 import { disconnect, searchConnection } from "./ble";
+import { error, log, warn } from "./logger";
 
 let advertiser: android.bluetooth.le.BluetoothLeAdvertiser;
 export let gattServer: android.bluetooth.BluetoothGattServer;
@@ -17,7 +18,7 @@ class BluetoothGattServerCallback extends android.bluetooth.BluetoothGattServerC
   }
 
   onConnectionStateChange(device: android.bluetooth.BluetoothDevice, status: number, newState: number): void {
-    console.log("Connection state change:", device.getAddress(), newState);
+    log("Connection state change:", device.getAddress(), newState);
   }
 
   onCharacteristicReadRequest(
@@ -26,7 +27,7 @@ class BluetoothGattServerCallback extends android.bluetooth.BluetoothGattServerC
     offset: number,
     characteristic: android.bluetooth.BluetoothGattCharacteristic,
   ): void {
-    console.log("Read request:", characteristic.getUuid().toString(), gameState.connecting);
+    log("Read request:", characteristic.getUuid().toString(), gameState.connecting);
     const value = new java.lang.String(gameState.connecting.toString()).getBytes();
     gattServer.sendResponse(device, requestId, android.bluetooth.BluetoothGatt.GATT_SUCCESS, 0, value);
   }
@@ -41,14 +42,14 @@ class BluetoothGattServerCallback extends android.bluetooth.BluetoothGattServerC
     value: androidNative.Array<number>,
   ): void {
     if (preparedWrite) {
-      console.error("Prepared Write not allowed!");
+      error("Prepared Write not allowed!");
     }
     const bytes = new Uint8Array(value.length);
     for (let i = 0; i < value.length; i++) {
       // value is signed, make it unsigned
       bytes[i] = value[i] & 0xff;
     }
-    console.log("Writes received:", bytes);
+    log("Writes received:", bytes);
     if (responseNeeded) {
       gattServer.sendResponse(device, requestId, android.bluetooth.BluetoothGatt.GATT_SUCCESS, 0, value);
     }
@@ -64,18 +65,18 @@ class AdvertiseCallback extends android.bluetooth.le.AdvertiseCallback {
   }
 
   onStartSuccess(): void {
-    console.log("BLE Advertising started");
+    log("BLE Advertising started");
   }
 
   onStartFailure(errorCode: number): void {
     searchConnection.set(false);
-    console.log("BLE Advertising failed:", errorCode);
+    log("BLE Advertising failed:", errorCode);
   }
 }
 
 export async function initializeGattServer() {
   if (advertiser) {
-    console.log("GATT Server already initialized...");
+    log("GATT Server already initialized...");
     return;
   }
   const context = Utils.android.getApplicationContext();
@@ -106,7 +107,7 @@ export async function initializeGattServer() {
   gattServer = bluetoothManager.openGattServer(context, new BluetoothGattServerCallback());
   gattServer.addService(service);
 
-  console.log("GATT server initialized successfully");
+  log("GATT server initialized successfully");
 }
 
 function stopAdvertising() {
@@ -115,12 +116,12 @@ function stopAdvertising() {
     advertiseCallback = undefined;
   }
   isAdvertising = false;
-  console.log("Stopped Advertising");
+  log("Stopped Advertising");
 }
 
 export function toggleAdvertising(isOn: boolean, timeout: number = 5) {
   if (isOn) {
-    console.log("Started Advertising");
+    log("Started Advertising");
     const serviceUUID = java.util.UUID.fromString(SERVICE_UUID);
     const settings = new android.bluetooth.le.AdvertiseSettings.Builder()
       .setAdvertiseMode(android.bluetooth.le.AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
@@ -139,7 +140,7 @@ export function toggleAdvertising(isOn: boolean, timeout: number = 5) {
     setTimeout(() => {
       if (isAdvertising) {
         if (gameState.connecting) {
-          console.warn("Connection Timeout!");
+          warn("Connection Timeout!");
           disconnect();
         }
         stopAdvertising();

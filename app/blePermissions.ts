@@ -1,6 +1,7 @@
 import { AndroidActivityRequestPermissionsEventData, Application, Utils, alert } from "@nativescript/core";
 import { Bluetooth } from "@nativescript-community/ble";
 import { request, check } from "@nativescript-community/perms";
+import { log } from "./logger";
 
 const ble = new Bluetooth();
 
@@ -26,17 +27,17 @@ export async function enableBluetooth() {
 
   const advertiseGranted = await requestBluetoothAdvertisePermission();
   if (!advertiseGranted) {
-    console.log("Bluetooth advertising permission denied.");
+    log("Bluetooth advertising permission denied.");
     return;
   }
 
-  console.log("Permissions granted:", bluetoothGranted, bluetoothScanGranted, locationGranted);
+  log("Permissions granted:", bluetoothGranted, bluetoothScanGranted, locationGranted);
 
   if (bluetoothGranted === "authorized" && bluetoothScanGranted === "authorized" && locationGranted === "authorized") {
     try {
       const enabled = await ble.enable();
       if (enabled) {
-        console.log("Bluetooth is enabled.");
+        log("Bluetooth is enabled.");
         const locationServicesEnabled = isLocationEnabled();
         if (!locationServicesEnabled) {
           await alert("Location services must be enabled for Bluetooth scanning.");
@@ -45,13 +46,13 @@ export async function enableBluetooth() {
           return;
         }
       } else {
-        console.log("Bluetooth is not enabled.");
+        log("Bluetooth is not enabled.");
       }
     } catch (error) {
-      console.log("Error enabling Bluetooth:", error);
+      log("Error enabling Bluetooth:", error);
     }
   } else {
-    console.log("Permissions denied. Cannot proceed with scanning.");
+    log("Permissions denied. Cannot proceed with scanning.");
   }
 }
 

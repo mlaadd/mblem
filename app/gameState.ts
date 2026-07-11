@@ -11,6 +11,7 @@ import {
   PLAY_DRAW,
   seedMessage,
 } from "./protocol";
+import { error, info, warn } from "./logger";
 import { get, writable } from "svelte/store";
 
 let lastInterval: number;
@@ -33,7 +34,7 @@ function combineSeeds(seedA: Uint8Array, seedB: Uint8Array) {
 export const handleMessage = async (binary: Uint8Array) => {
   const message = parseMessage(binary);
   if (!message) {
-    console.error("Invalid message, no separator:", binary);
+    error("Invalid message, no separator:", binary);
     return;
   }
   const { type, payload } = message;
@@ -58,7 +59,7 @@ export const handleMessage = async (binary: Uint8Array) => {
           } catch {
             if (++i > 20) {
               clearInterval(lastInterval);
-              console.warn("This device didn't initiate a connection.");
+              warn("This device didn't initiate a connection.");
             }
           }
         }, 1000);
@@ -71,7 +72,7 @@ export const handleMessage = async (binary: Uint8Array) => {
           gameState.seeds[0] = thisSeed;
           await write(seedMessage(thisSeed));
         } else {
-          console.warn("Not ready, this device is already disconnected.");
+          warn("Not ready, this device is already disconnected.");
         }
         break;
       case GameSignal.DISCONNECTING:
@@ -79,7 +80,7 @@ export const handleMessage = async (binary: Uint8Array) => {
         if (get(connected)) {
           await disconnect();
         } else {
-          console.warn("No disconnect needed, this device is already disconnected.");
+          warn("No disconnect needed, this device is already disconnected.");
         }
         break;
     }
@@ -108,7 +109,7 @@ export const handleMessage = async (binary: Uint8Array) => {
             [cardsCache[i], cardsCache[j]] = [cardsCache[j], cardsCache[i]];
           }
           cards.set(cardsCache);
-          console.info("You are Player", gameState.player);
+          info("You are Player", gameState.player);
           if (gameState.player === 1) {
             turn.set(true);
           } else turn.set(false);
@@ -122,7 +123,7 @@ export const handleMessage = async (binary: Uint8Array) => {
         }
       }, 100);
     } catch (e) {
-      console.error(e);
+      error(e);
     }
   } else if (type === MessageType.PLAY) {
     const msg = +new TextDecoder().decode(payload);

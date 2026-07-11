@@ -2,6 +2,7 @@ import { Bluetooth } from "@nativescript-community/ble";
 import { CHARACTERISTIC_UUID, SERVICE_UUID } from "./constants";
 import { gameState, ready, connected, resetGameState } from "./gameState";
 import { gameMessage, GameSignal } from "./protocol";
+import { error, log } from "./logger";
 import { get, writable } from "svelte/store";
 
 export const searchConnection = writable(false);
@@ -20,7 +21,7 @@ export const write = async (message: Uint8Array): Promise<boolean> => {
     });
     return true;
   } catch (e) {
-    console.error("Sending message failed", e);
+    error("Sending message failed", e);
     return false;
   }
 };
@@ -35,14 +36,14 @@ export const read = () => {
 
 export const disconnect = async () => {
   if (get(connected)) {
-    console.log("!about to disconnect");
+    log("!about to disconnect");
     await write(gameMessage(GameSignal.DISCONNECTING));
   }
   connected.set(false);
   await ble.disconnect({
     UUID: peripheralUUID,
   });
-  console.log("Gracefully disconnected");
+  log("Gracefully disconnected");
   return true;
 };
 
@@ -54,7 +55,7 @@ export const requestMtu = async () => {
 };
 
 export async function scanAndConnect() {
-  console.log("Scanning for players...");
+  log("Scanning for players...");
   resetGameState();
   searchConnection.set(true);
   let foundSomeone = false;
@@ -75,7 +76,7 @@ export async function scanAndConnect() {
           await write(gameMessage(GameSignal.CONNECTING));
         },
         onDisconnected: function (peripheral) {
-          console.log("Peripheral disconnected with UUID: " + peripheral.UUID, peripheralUUID);
+          log("Peripheral disconnected with UUID: " + peripheral.UUID, peripheralUUID);
           searchConnection.set(false);
           ready.set(false);
         },
@@ -83,7 +84,7 @@ export async function scanAndConnect() {
     },
   });
   if (!foundSomeone) {
-    console.log("No players found");
+    log("No players found");
     searchConnection.set(false);
   }
 }
