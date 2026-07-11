@@ -1,0 +1,12 @@
+{
+  // Typechecks the *.test.ts files with Bun's types (which provide `bun:test`).
+  // Kept separate from the app config so Bun's globals don't leak
+  // into the NativeScript code.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["bun"],
+    "typeRoots": ["./node_modules/@types", "./types"]
+  },
+  "include": ["app/**/*.test.ts"],
+  "exclude": ["./node_modules", "./platforms"]
+}

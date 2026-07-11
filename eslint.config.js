@@ -49,5 +49,20 @@ export default defineConfig([
       // 'svelte/rule-name': 'error'
     },
   },
+  {
+    // Build-tooling configs are CommonJS Node scripts by design.
+    files: ["webpack.config.js", "svelte.config.js"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+    },
+  },
+  {
+    // NativeScript type references must use triple-slash directives.
+    files: ["**/*.d.ts"],
+    rules: {
+      "@typescript-eslint/triple-slash-reference": "off",
+    },
+  },
   globalIgnores(["platforms/*"]),
 ]);

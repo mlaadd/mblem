@@ -5,15 +5,7 @@
   import { navigate } from "@nativescript-community/svelte-native";
   import Playing from "./Playing.svelte";
 
-  $: {
-    if ($ready) {
-      startGame();
-    }
-  }
-
-  const startGame = (): void => {
-    navigate({ page: Playing });
-  };
+  $: if ($ready) navigate({ page: Playing });
 
   const scan = async () => {
     toggleAdvertising(true, 10);

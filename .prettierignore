@@ -1,0 +1,7 @@
+platforms/
+hooks/
+node_modules/
+App_Resources/
+app/fonts/
+*.apk
+bun.lock
