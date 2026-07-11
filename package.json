@@ -30,6 +30,9 @@
     "@nativescript/core": "^9.0.0"
   },
   "scripts": {
+    "start": "ns run android",
+    "build": "ns build android",
+    "build:release": "ns build android --release",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

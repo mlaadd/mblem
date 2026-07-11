@@ -30,23 +30,40 @@ bun install
 
 ### Usage
 
-Build the Android application:
+Run the app on a connected device or emulator with live reload (dev):
 
 ```sh
-ns build android
+bun start
 ```
 
-To run the application directly on a connected device:
+Build a debug APK:
 
 ```sh
-ns run android
+bun run build
+```
+
+Build an optimized release APK:
+
+```sh
+bun run build:release
+```
+
+`build:release` builds in webpack production mode (minified/optimized). To sign it for distribution, pass your keystore, e.g.:
+
+```sh
+bun run build:release -- \
+  --key-store-path <path> --key-store-password <password> \
+  --key-store-alias <alias> --key-store-alias-password <password>
 ```
 
 ### Scripts
 
 ```sh
+bun start             # ns run android (dev, live reload)
+bun run build         # ns build android (debug APK)
+bun run build:release # ns build android --release (optimized, production mode)
 bun run lint          # ESLint
-bun run typecheck     # tsc --noEmit
+bun run typecheck     # tsc --noEmit (app + tests)
 bun run format        # Prettier (write); use format:check in CI
 bun test              # unit tests for the card / rules / protocol modules
 ```
