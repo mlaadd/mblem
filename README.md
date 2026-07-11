@@ -22,15 +22,45 @@ To set up the development environment, follow the official NativeScript document
 
 https://docs.nativescript.org/setup/
 
+This project uses [Bun](https://bun.sh) as its package manager and task runner. Install dependencies with:
+
+```sh
+bun install
+```
+
 ### Usage
 
-Clone the repository and build the Android application:
+Build the Android application:
 
 ```sh
 ns build android
 ```
 
-To run the application directly on a connected device: 
+To run the application directly on a connected device:
 
 ```sh
 ns run android
+```
+
+### Scripts
+
+```sh
+bun run lint          # ESLint
+bun run typecheck     # tsc --noEmit
+bun run format        # Prettier (write); use format:check in CI
+bun test              # unit tests for the card / rules / protocol modules
+```
+
+CI (`.github/workflows/ci.yml`) runs the checks above and builds the APK on every push and pull request.
+
+### Architecture
+
+The game logic is split into small, dependency-free modules so it can be unit-tested without NativeScript:
+
+- `app/cards.ts` — card encoding and the deck.
+- `app/rules.ts` — Mau-Mau rules (shared by the local player and the remote-move handler, so the two devices can't drift apart).
+- `app/protocol.ts` — the BLE wire format.
+
+The card encoding, message format, and BLE handshake are documented in [`docs/protocol.md`](docs/protocol.md).
+
+> **Note:** moves are trusted, not validated on the receiving device — this is a friendly, same-room game, not an adversarial protocol. See the trust model in the protocol doc.
