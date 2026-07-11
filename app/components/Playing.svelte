@@ -6,6 +6,9 @@
   import { connected, gameState, selfHand, oppHand, topCard, cards, turn } from "~/gameState";
   import { canPlay, drawCount, keepsTurn, playDrawDelta } from "~/rules";
   import { CARD_BACK, cardToUnicode, isRed } from "~/cards";
+  import { playMessage, PLAY_DRAW } from "~/protocol";
+
+  const SEND_FAILED_MESSAGE = "Couldn't reach your opponent ~ the connection may be lost.";
 
   const playCard = async (card: number) => {
     if (!$turn) return;
@@ -16,7 +19,8 @@
     $cards.push($topCard);
     $topCard = $selfHand.splice(card, 1)[0];
     $selfHand = $selfHand;
-    await write("PLAY:" + card);
+    const sent = await write(playMessage(card));
+    if (!sent) alert(SEND_FAILED_MESSAGE);
     if (keepsTurn(played)) return;
     $turn = false;
   };
@@ -29,7 +33,8 @@
     $selfHand.push(...$cards.splice(0, numToDraw));
     $cards = $cards;
     $selfHand = $selfHand;
-    await write("PLAY:-1");
+    const sent = await write(playMessage(PLAY_DRAW));
+    if (!sent) alert(SEND_FAILED_MESSAGE);
   };
 
   $: {
@@ -105,7 +110,7 @@
       verticalAlignment="bottom"
       marginBottom="20"
     >
-      {#each chunk($selfHand, 7) as handRow (handRow)}
+      {#each chunk($selfHand, 7) as handRow, rowIndex (rowIndex)}
         <stackLayout orientation="horizontal" horizontalAlignment="center" marginBottom="-30">
           {#each handRow as card, i (card)}
             <label

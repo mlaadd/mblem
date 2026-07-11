@@ -2,6 +2,15 @@ import { disconnect, read, write } from "./ble";
 import { toggleAdvertising } from "./blePeripheral";
 import { buildDeck, NO_CARD } from "./cards";
 import { drawCount, keepsTurn, playDrawDelta } from "./rules";
+import {
+  gameMessage,
+  GameSignal,
+  isConnectingResponse,
+  MessageType,
+  parseMessage,
+  PLAY_DRAW,
+  seedMessage,
+} from "./protocol";
 import { get, writable } from "svelte/store";
 
 let lastInterval: number;
@@ -22,23 +31,17 @@ function combineSeeds(seedA: Uint8Array, seedB: Uint8Array) {
 }
 
 export const handleMessage = async (binary: Uint8Array) => {
-  const colon = 58;
-  const index = binary.indexOf(colon);
-
-  if (index === -1) {
-    console.error("Invalid message, no colon:", binary);
+  const message = parseMessage(binary);
+  if (!message) {
+    console.error("Invalid message, no separator:", binary);
     return;
   }
-  const typeBytes = binary.slice(0, index);
-  const msgBytes = binary.slice(index + 1);
+  const { type, payload } = message;
 
-  const decoder = new TextDecoder();
-  const type = decoder.decode(typeBytes);
-
-  if (type === "GAME") {
-    const msg = decoder.decode(msgBytes);
-    switch (msg) {
-      case "CONNECTING": {
+  if (type === MessageType.GAME) {
+    const signal = new TextDecoder().decode(payload);
+    switch (signal) {
+      case GameSignal.CONNECTING: {
         let i = 0;
         if (lastInterval) {
           clearInterval(lastInterval);
@@ -47,10 +50,10 @@ export const handleMessage = async (binary: Uint8Array) => {
           try {
             const remoteState = await read();
             const res = new Uint8Array(remoteState.value);
-            if (res[0] === 116) {
+            if (isConnectingResponse(res)) {
               clearInterval(lastInterval);
               toggleAdvertising(false);
-              await write("GAME:READY");
+              await write(gameMessage(GameSignal.READY));
             }
           } catch {
             if (++i > 20) {
@@ -61,17 +64,17 @@ export const handleMessage = async (binary: Uint8Array) => {
         }, 1000);
         break;
       }
-      case "READY":
+      case GameSignal.READY:
         if (get(connected)) {
           const thisSeed = new Uint8Array(32);
           crypto.getRandomValues(thisSeed);
           gameState.seeds[0] = thisSeed;
-          await write("SEED:", thisSeed);
+          await write(seedMessage(thisSeed));
         } else {
           console.warn("Not ready, this device is already disconnected.");
         }
         break;
-      case "DISCONNECTING":
+      case GameSignal.DISCONNECTING:
         clearInterval(lastInterval);
         if (get(connected)) {
           await disconnect();
@@ -80,9 +83,11 @@ export const handleMessage = async (binary: Uint8Array) => {
         }
         break;
     }
-  } else if (type === "SEED") {
+  } else if (type === MessageType.SEED) {
     try {
-      gameState.seeds[1] = msgBytes;
+      // Copy into a fresh buffer so we don't retain the BLE transport array and
+      // the seed type matches gameState.seeds (Uint8Array<ArrayBuffer>).
+      gameState.seeds[1] = new Uint8Array(payload);
       const interval = setInterval(() => {
         if (gameState.seeds.filter((e) => e.length > 0).length > 1) {
           resetCards();
@@ -119,9 +124,9 @@ export const handleMessage = async (binary: Uint8Array) => {
     } catch (e) {
       console.error(e);
     }
-  } else if (type === "PLAY") {
-    const msg = +decoder.decode(msgBytes);
-    if (msg === -1) {
+  } else if (type === MessageType.PLAY) {
+    const msg = +new TextDecoder().decode(payload);
+    if (msg === PLAY_DRAW) {
       turn.set(true);
       const numToDraw = drawCount(gameState.drawAcc);
       cards.update((c) => {
