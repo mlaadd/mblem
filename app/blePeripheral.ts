@@ -7,6 +7,7 @@ let advertiser: android.bluetooth.le.BluetoothLeAdvertiser;
 export let gattServer: android.bluetooth.BluetoothGattServer;
 let isAdvertising = false;
 let characteristic: android.bluetooth.BluetoothGattCharacteristic;
+let advertiseCallback: AdvertiseCallback | undefined;
 
 @NativeClass()
 class BluetoothGattServerCallback extends android.bluetooth.BluetoothGattServerCallback {
@@ -108,6 +109,15 @@ export async function initializeGattServer() {
   console.log("GATT server initialized successfully");
 }
 
+function stopAdvertising() {
+  if (advertiseCallback) {
+    advertiser.stopAdvertising(advertiseCallback);
+    advertiseCallback = undefined;
+  }
+  isAdvertising = false;
+  console.log("Stopped Advertising");
+}
+
 export function toggleAdvertising(isOn: boolean, timeout: number = 5) {
   if (isOn) {
     console.log("Started Advertising");
@@ -122,8 +132,8 @@ export function toggleAdvertising(isOn: boolean, timeout: number = 5) {
       .setIncludeDeviceName(true)
       .build();
 
-    const ad = new AdvertiseCallback();
-    advertiser.startAdvertising(settings, data, ad);
+    advertiseCallback = new AdvertiseCallback();
+    advertiser.startAdvertising(settings, data, advertiseCallback);
     isAdvertising = true;
 
     setTimeout(() => {
@@ -132,16 +142,12 @@ export function toggleAdvertising(isOn: boolean, timeout: number = 5) {
           console.warn("Connection Timeout!");
           disconnect();
         }
-        advertiser.stopAdvertising(ad);
-        console.log("Stopped Advertising");
-        isAdvertising = false;
+        stopAdvertising();
       }
     }, timeout * 1000);
   } else {
     if (isAdvertising) {
-      advertiser.stopAdvertising(new AdvertiseCallback());
-      console.log("Stopped Advertising");
-      isAdvertising = false;
+      stopAdvertising();
     }
   }
 }
