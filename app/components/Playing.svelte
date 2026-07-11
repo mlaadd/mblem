@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy, onMount } from "svelte";
   import { alert, Application } from "@nativescript/core";
   import { goBack } from "@nativescript-community/svelte-native";
   import { disconnect, write } from "~/ble";
@@ -70,7 +71,13 @@
     disconnect();
   }
 
-  Application.android.on(Application.AndroidApplication.activityBackPressedEvent, onBackPressed);
+  onMount(() => {
+    Application.android.on(Application.AndroidApplication.activityBackPressedEvent, onBackPressed);
+  });
+
+  onDestroy(() => {
+    Application.android.off(Application.AndroidApplication.activityBackPressedEvent, onBackPressed);
+  });
 </script>
 
 <page>
