@@ -102,8 +102,8 @@ export const handleMessage = async (binary: Uint8Array) => {
             }
           }
           const cardsCache = get(cards);
-          for (let i = get(cards).length - 1; i > 0; i--) {
-            const seed = combinedSeed[get(cards).length - i];
+          for (let i = cardsCache.length - 1; i > 0; i--) {
+            const seed = combinedSeed[cardsCache.length - i];
             const j = seed % (i + 1);
 
             [cardsCache[i], cardsCache[j]] = [cardsCache[j], cardsCache[i]];
