@@ -1,6 +1,6 @@
 <script lang="ts">
   import { alert, Application } from "@nativescript/core";
-  import { goBack } from "svelte-native";
+  import { goBack } from "@nativescript-community/svelte-native";
   import { disconnect, write } from "~/ble";
   import { connected, gameState, selfHand, oppHand, topCard, cards, turn } from "~/gameState";
 

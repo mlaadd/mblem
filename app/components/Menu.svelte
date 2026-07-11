@@ -2,7 +2,7 @@
   import { toggleAdvertising } from "~/blePeripheral";
   import { scanAndConnect, searchConnection } from "~/ble";
   import { ready } from "~/gameState";
-  import { navigate } from "svelte-native";
+  import { navigate } from "@nativescript-community/svelte-native";
   import Playing from "./Playing.svelte";
 
   $: {
