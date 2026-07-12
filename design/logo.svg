@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="89" height="122">
+  <rect width="83" height="116" x="3" y="3" fill="#fff" stroke="#0082fc" stroke-width="6" rx="12" ry="12"/>
+  <path fill="#0082fc" d="M31.65 85.99V36.01h6.3l19.4 11.48v5.88L45.5 60.72l11.83 7.07v5.88L37.94 85.99Zm6.3-27.02 13.51-8.61-13.5-8.05zm0 20.3 13.51-8.61-13.5-8.05z"/>
+  <path id="a" fill="#0082fc" d="M12.45 28V9.44h2.34l4.58 3.27 4.81-3.27h2.34V28h-2.34V12.01l-4.81 3.22-4.58-3.2V28Z"/>
+  <use href="#a" transform="rotate(180 44.5 61)"/>
+</svg>
