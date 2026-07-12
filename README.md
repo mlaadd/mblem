@@ -1,4 +1,4 @@
-# 🃏 MBLEM
+# <img src="https://raw.githubusercontent.com/mlaadd/mblem/refs/heads/main/design/logo.svg" alt="🃏" style="height:1.4em"> MBLEM
 
 MBLEM is an Android app that lets two nearby players play the card game Mau-Mau together using Bluetooth Low Energy (BLE).
 
